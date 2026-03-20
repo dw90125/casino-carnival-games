@@ -1,0 +1,16 @@
+{
+  "name": "3-Card Poker Dev",
+  "image": "mcr.microsoft.com/devcontainers/javascript-node:20-bookworm",
+  "customizations": {
+    "vscode": {
+      "settings": {
+        "terminal.integrated.defaultProfile.linux": "bash"
+      },
+      "extensions": [
+        "dbaeumer.vscode-eslint"
+      ]
+    }
+  },
+  "remoteUser": "node",
+  "postCreateCommand": "npm install"
+}
