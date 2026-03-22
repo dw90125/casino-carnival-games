@@ -1,5 +1,5 @@
 {
-  "name": "3-Card Poker Dev",
+  "name": "Casino Carnival Games",
   "image": "mcr.microsoft.com/devcontainers/javascript-node:20-bookworm",
   "customizations": {
     "vscode": {
@@ -7,10 +7,12 @@
         "terminal.integrated.defaultProfile.linux": "bash"
       },
       "extensions": [
-        "dbaeumer.vscode-eslint"
+        "dbaeumer.vscode-eslint",
+        "google.geminicodeassist",
+	      "pkief.material-icon-theme"
       ]
     }
   },
   "remoteUser": "node",
-  "postCreateCommand": "npm install"
+  //"postCreateCommand": "npm install"
 }

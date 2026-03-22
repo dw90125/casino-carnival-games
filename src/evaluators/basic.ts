@@ -6,16 +6,21 @@
 * 
 */
 
+import { IBasicConfig } from "../types/ibasicconfig.js";
+
 export class BasicEvaluator {
-    private RANK_ORDER:string[] = ["A", "K", "Q", "J", "T", "9", "8", "7", "6", "5", "4", "3", "2"];
-    private SUIT_ORDER:string[] = ["S", "H", "D", "C"];
+    private config: IBasicConfig;
 
-    private hand:string[];
-    private ranks:Record<string, number>;
-    private suits:Record<string, number>;
-    private matrix:Record<string, Record<string, number>>;
+    private hand: string[] = [];
+    private ranks: Record<string, number> = {};
+    private suits: Record<string, number> = {};
+    private matrix: Record<string, Record<string, number>> = {};
 
-    constructor(hand: string[]) {
+    constructor(config: IBasicConfig) {
+        this.config = config;
+    }
+
+    public set_hand(hand: string[]): void {
         this.hand = hand;
 
         this.ranks = this.sort_ranks();
@@ -53,7 +58,7 @@ export class BasicEvaluator {
 
     public has_straight():boolean {
         const hand_size = Math.min(this.hand.length, 5);
-        const bits = this.RANK_ORDER.map(r => this.ranks[r] > 0 ? '1' : '0');
+        const bits = this.config.RANKS.map(r => this.ranks[r] > 0 ? '1' : '0');
         bits.push(bits[0]); // for the ace-low straight.
 
         return bits.join('').includes('1'.repeat(hand_size));
@@ -74,10 +79,24 @@ export class BasicEvaluator {
         const hand_size = Math.min(this.hand.length, 5);
 
         for (const [suit, ranks] of Object.entries(this.matrix)) {
-            const bits = this.RANK_ORDER.map(r => ranks[r] > 0 ? '1' : '0');
+            const bits = this.config.RANKS.map(r => ranks[r] > 0 ? '1' : '0');
             bits.push(bits[0]); // for the ace-low straight.
 
             if (bits.join('').includes('1'.repeat(hand_size))) return true;
+        }
+
+        return false;
+    }
+
+    //----------------------------------------------------------------------------------------------------------------------
+    // royal flushes may be the easiest.  you MUST have specific cards.
+    public has_royal_flush():boolean {
+        const hand_size = Math.min(this.hand.length, 5);
+
+        for (const [suit, ranks] of Object.entries(this.matrix)) {
+            const bits = this.config.RANKS.map(r => ranks[r] > 0 ? '1' : '0');
+
+            if (bits.join('').startsWith('1'.repeat(hand_size))) return true;
         }
 
         return false;
@@ -89,7 +108,7 @@ export class BasicEvaluator {
     private sort_ranks(): Record<string, number> {
         const ranks: Record<string, number> = {};
 
-        this.RANK_ORDER.forEach(r => ranks[r] = 0);
+        this.config.RANKS.forEach(r => ranks[r] = 0);
 
         for (const card of this.hand) {
             const r = card[0];
@@ -102,7 +121,7 @@ export class BasicEvaluator {
     private sort_suits(): Record<string, number> {
         const suits: Record<string, number> = {};
 
-        this.SUIT_ORDER.forEach(s => suits[s] = 0);
+        this.config.SUITS.forEach(s => suits[s] = 0);
 
         for (const card of this.hand) {
             const s = card[1];
@@ -115,9 +134,9 @@ export class BasicEvaluator {
     private sort_matrix(): Record<string, Record<string, number>> {
         const matrix: Record<string, Record<string, number>> = {};
 
-        this.SUIT_ORDER.forEach(s => {
+        this.config.SUITS.forEach(s => {
             matrix[s] = {};
-            this.RANK_ORDER.forEach(r => matrix[s][r] = 0);
+            this.config.RANKS.forEach(r => matrix[s][r] = 0);
         });
 
         for (const card of this.hand) {

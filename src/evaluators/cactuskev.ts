@@ -38,9 +38,9 @@ export class CactusKevEvaluator {
     this.config = config;
   }
 
-  public evaluate(hand: string[]): number | false {
+  public evaluate(hand: string[]): number {
     const q = this.q_val(hand);
-    if (q === false) return false;
+    if (q === false) return 9999;
 
     if (this.is_flush(hand)) {
       return this.config.FLUSHES[q] ?? false;
@@ -56,7 +56,7 @@ export class CactusKevEvaluator {
         return this.config.VALUES[p];
     }
 
-    return false;
+    return 9999;
   }
 
   private is_flush(hand: string[]): boolean {
