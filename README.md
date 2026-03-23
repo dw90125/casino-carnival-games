@@ -44,8 +44,3 @@ xxxAKQJT 98765432 CDHSrrrr xxpppppp
 * **Language:** TypeScript (ES6+)
 * **Environment:** WSL2 (Ubuntu) / Docker
 * **Testing:** Vitest
-
-## 🚧 TODO
-* Finish evaluation of "side" bets for 3-card poker
-* Create an API so that the engine can send games to a front-end
-* Add more games like High-Card Flush and Pai-Gow Poker
