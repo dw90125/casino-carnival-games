@@ -1,34 +1,26 @@
-import * as CasinoGame from "../../types/games/three-card-poker.js";
-import { BasicEvaluator } from "../../evaluators/basic.js";
-import { BasicConfig } from "../../config/basic/five-card-poker.js";
-import { CactusKevEvaluator } from "../../evaluators/cactuskev.js";
-import { CactusKevConfig } from "../../config/cactuskev/three-card-poker.js";
+import { IHand, ISeat, IDealer } from "../../types/games/base.js";
+import { IThreeCardPokerWager, IThreeCardPokerPayout } from "../../types/games/three-card-poker.js";
 
-const cactuskev = new CactusKevEvaluator(CactusKevConfig);
-const basicev = new BasicEvaluator(BasicConfig);
+import { CactusKevEvaluator } from "../../evaluators/engines/cactuskev.js";
+import { CactusKevConfig as CactusKevConfig3, CactusKevHandName as CactusKevHandName3} from "../../evaluators/config/cactuskev/three-card-poker.js";
+import { CactusKevConfig as CactusKevConfig5} from "../../evaluators/config/cactuskev/five-card-poker.js";
 
-const getHandName = (eqv: number): string => {
-    if (eqv <= 12) return "Straight Flush";
-    if (eqv <= 25) return "Three of a Kind";
-    if (eqv <= 37) return "Straight";
-    if (eqv <= 311) return "Flush";
-    if (eqv <= 467) return "Pair";
-    return "High Card";
-};
+const cactuskev3 = new CactusKevEvaluator(CactusKevConfig3);
+const cactuskev5 = new CactusKevEvaluator(CactusKevConfig5);
 
-export const masterDeck = Object.keys(CactusKevConfig.DECK);
+export const cactusDeck = Object.keys(CactusKevConfig3.DECK);
 
-export const evaluateHand = (hand: CasinoGame.IHand): CasinoGame.IHand => {
-    const eqv = cactuskev.evaluate(hand.cards);
+export const evaluateHand = (hand: IHand): IHand => {
+    const eqv = cactuskev3.evaluate(hand.cards);
 
     return {
         ...hand,
-        eqv: eqv,
-        name: getHandName(eqv)
+        name: CactusKevHandName3(eqv),
+        eqv: eqv
     };
 };
 
-export const play = (seat: CasinoGame.ISeat<CasinoGame.IThreeCardWager, CasinoGame.IThreeCardPayout>, dealer: CasinoGame.IDealer): void => {
+export const play = (seat: ISeat<IThreeCardPokerWager, IThreeCardPokerPayout>, dealer: IDealer): void => {
     // first, is this hand worthy of play at all?
     // from wizardofodds.com:
     // 1. Make raise with Q-6-4 or higher.
@@ -70,7 +62,7 @@ export const play = (seat: CasinoGame.ISeat<CasinoGame.IThreeCardWager, CasinoGa
     }
 };
 
-export const pp = (seat: CasinoGame.ISeat<CasinoGame.IThreeCardWager, CasinoGame.IThreeCardPayout>): void => {
+export const pp = (seat: ISeat<IThreeCardPokerWager, IThreeCardPokerPayout>): void => {
     seat.payout.pp = 0;
 
     if (seat.hand.eqv > 0) {
@@ -88,31 +80,40 @@ export const pp = (seat: CasinoGame.ISeat<CasinoGame.IThreeCardWager, CasinoGame
     }
 }
 
-export const six = (seat: CasinoGame.ISeat<CasinoGame.IThreeCardWager, CasinoGame.IThreeCardPayout>, dealer: CasinoGame.IDealer): void => {
+export const six = (seat: ISeat<IThreeCardPokerWager, IThreeCardPokerPayout>, dealer: IDealer): void => {
     seat.payout.six = 0;
-
+    
     const six_card_hand = [...seat.hand.cards, ...dealer.hand.cards];
 
-    basicev.set_hand(six_card_hand);
+    let best_eqv = 9999;
+    for (let i = 0; i < 6; i++) {
+        const five_card_hand = [...six_card_hand.slice(0, i), ...six_card_hand.slice(i + 1)];
+        const eqv = cactuskev5.evaluate(five_card_hand);
+        if (eqv < best_eqv) {
+            best_eqv = eqv;
+        }
+    }
     
-    if (basicev.has_royal_flush()) {
-        seat.payout.six = (seat.wager.six * 1001);
-    } else if (basicev.has_straight_flush()) {
-        seat.payout.six = (seat.wager.six * 201);
-    } else if (basicev.has_quads()) {
-        seat.payout.six = (seat.wager.six * 51);
-    } else if (basicev.has_full_house()) {
-        seat.payout.six = (seat.wager.six * 26);
-    } else if (basicev.has_flush()) {
-        seat.payout.six = (seat.wager.six * 21);
-    } else if (basicev.has_straight()) {
-        seat.payout.six = (seat.wager.six * 11);
-    } else if (basicev.has_trips()) {
-        seat.payout.six = (seat.wager.six * 6);
+    if (best_eqv > 0) {
+        if (best_eqv == 1) { // ROYAL 1000:1
+            seat.payout.six = (seat.wager.six * 1001);
+        } else if (best_eqv <= 10) { // SF 200:1
+            seat.payout.six = (seat.wager.six * 201);
+        } else if (best_eqv <= 166) { // QUADS 50:1
+            seat.payout.six = (seat.wager.six * 51);
+        } else if (best_eqv <= 322) { // FULL HOUSE 25:1
+            seat.payout.six = (seat.wager.six * 26);
+        } else if (best_eqv <= 1599) { // FLUSH 20:1
+            seat.payout.six = (seat.wager.six * 21);
+        } else if (best_eqv <= 1609) { // STRAIGHT 10:1
+            seat.payout.six = (seat.wager.six * 11);
+        } else if (best_eqv <= 2467) { // TRIPS 5:1}
+            seat.payout.six = (seat.wager.six * 6);
+        }
     }
 }
 
-export const prog = (seat: CasinoGame.ISeat<CasinoGame.IThreeCardWager, CasinoGame.IThreeCardPayout>): void => {
+export const prog = (seat: ISeat<IThreeCardPokerWager, IThreeCardPokerPayout>): void => {
     //TODO: many progressives have an "envy" for the jackpot wagers.  I haven't added that yet.
     seat.payout.prog = 0;
 

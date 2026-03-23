@@ -1,16 +1,14 @@
-import { IBaseWager, IBasePayout, IHand, ISeat, IDealer, ResolverFunction  } from "./base.js";
+import { IBaseWager, IBasePayout, IHand, ISeat, IDealer, IGameOutcome } from "./base.js";
 
-export { IBaseWager, IBasePayout, IHand, ISeat, IDealer, ResolverFunction };
-
-export interface IThreeCardWager extends IBaseWager {
+export interface IThreeCardPokerWager extends IBaseWager {
     ante: number;
-    play: number;
+    play?: number;
     pp: number;
     six: number;
     prog: number;
 }
 
-export interface IThreeCardPayout extends IBasePayout {
+export interface IThreeCardPokerPayout extends IBasePayout {
     ante: number;
     play: number;
     pp: number;

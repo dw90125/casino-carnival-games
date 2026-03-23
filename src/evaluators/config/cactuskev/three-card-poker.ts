@@ -15,7 +15,7 @@
 * 
 */
 
-import { ICactusKevConfig } from "../../types/icactuskevconfig.js";
+import { ICactusKevConfig } from "../../../types/evaluators/icactuskevconfig.js";
 
 /*
 * "Three Card Poker" uses one standard 52-card deck.  The CactusKev values for each card
@@ -627,4 +627,14 @@ export const CactusKevConfig: ICactusKevConfig = {
   UNIQUES,
   PRODUCTS,
   VALUES
+};
+
+export const CactusKevHandName = (eqv: number): string => {
+  if (eqv == 1) return "Royal Flush";
+  if (eqv <= 12) return "Straight Flush";
+  if (eqv <= 25) return "Three of a Kind";
+  if (eqv <= 37) return "Straight";
+  if (eqv <= 311) return "Flush";
+  if (eqv <= 467) return "Pair";
+  return "High Card";
 };

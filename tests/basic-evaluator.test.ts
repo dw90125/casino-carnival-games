@@ -1,6 +1,6 @@
 import { describe, it, expect, beforeEach } from 'vitest';
-import { BasicEvaluator } from "../src/evaluators/basic.js";
-import { BasicConfig } from "../src/config/basic/five-card-poker.js";
+import { BasicEvaluator } from "../src/evaluators/engines/basic.js";
+import { BasicConfig } from "../src/evaluators/config/basic/five-card-poker.js";
 
 describe('BasicEvaluator', () => {
   const engine = new BasicEvaluator(BasicConfig) as any;
