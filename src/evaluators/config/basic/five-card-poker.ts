@@ -1,4 +1,4 @@
-import { IBasicConfig } from "../../types/ibasicconfig.js"
+import { IBasicConfig } from "../../../types/evaluators/ibasicconfig.js"
 
 /*
 * Five-Card Poker uses one standard 52-card deck.

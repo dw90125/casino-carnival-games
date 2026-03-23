@@ -6,7 +6,7 @@
 * 
 */
 
-import { IBasicConfig } from "../types/ibasicconfig.js";
+import { IBasicConfig } from "../../types/evaluators/ibasicconfig.js";
 
 export class BasicEvaluator {
     private config: IBasicConfig;

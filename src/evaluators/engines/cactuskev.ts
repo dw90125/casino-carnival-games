@@ -29,7 +29,7 @@
 * lookups are used for straights and flushes, which are much simpler to evaluate.
 */
 
-import { ICactusKevConfig } from "../types/icactuskevconfig.js";
+import { ICactusKevConfig } from "../../types/evaluators/icactuskevconfig.js";
 
 export class CactusKevEvaluator {
   private config: ICactusKevConfig;

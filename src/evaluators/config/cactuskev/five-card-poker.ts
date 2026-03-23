@@ -4,7 +4,7 @@
 * 
 * https://en.wikipedia.org/wiki/List_of_poker_hands
 */
-import { ICactusKevConfig } from "../../types/icactuskevconfig.js";
+import { ICactusKevConfig } from "../../../types/evaluators/icactuskevconfig.js";
 
 /*
 * Five-Card Poker uses one standard 52-card deck.  The CactusKev values for each card
@@ -1960,4 +1960,17 @@ export const CactusKevConfig: ICactusKevConfig = {
   UNIQUES,
   PRODUCTS,
   VALUES
+};
+
+export const CactusKevHandName = (eqv: number): string => {
+  if (eqv == 1) return "Royal Flush";
+  if (eqv <= 10) return "Straight Flush";
+  if (eqv <= 166) return "Four of a Kind";
+  if (eqv <= 322) return "Full House";
+  if (eqv <= 1599) return "Flush";
+  if (eqv <= 1609) return "Straight";
+  if (eqv <= 2467) return "Three of a Kind";
+  if (eqv <= 3325) return "Two Pair";
+  if (eqv <= 6185) return "Pair";
+  return "High Card";
 };
