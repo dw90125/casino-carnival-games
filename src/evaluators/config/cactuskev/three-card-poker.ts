@@ -12,7 +12,6 @@
 * - Flush
 * - Pair
 * - High-card
-* 
 */
 
 import { ICactusKevConfig } from "../../../types/evaluators/icactuskevconfig.js";
@@ -31,7 +30,7 @@ const DECK: Record<string, number> = {
 
 /*
 * this is a table lookup for all "flush" hands (e.g. both
-* flushes and straight-flushes. entries containing a zero
+* flushes and straight-flushes). entries containing a zero
 * mean that combination is not possible with a five-card
 * flush hand.
 */

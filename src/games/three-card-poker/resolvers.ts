@@ -8,8 +8,6 @@ import { CactusKevConfig as CactusKevConfig5} from "../../evaluators/config/cact
 const cactuskev3 = new CactusKevEvaluator(CactusKevConfig3);
 const cactuskev5 = new CactusKevEvaluator(CactusKevConfig5);
 
-export const cactusDeck = Object.keys(CactusKevConfig3.DECK);
-
 export const evaluateHand = (hand: IHand): IHand => {
     const eqv = cactuskev3.evaluate(hand.cards);
 
@@ -18,6 +16,10 @@ export const evaluateHand = (hand: IHand): IHand => {
         name: CactusKevHandName3(eqv),
         eqv: eqv
     };
+};
+
+export const dealerQualifies = (hand: IHand): boolean => {
+    return (hand.eqv <= 629); // Q-3-2 or better
 };
 
 export const play = (seat: ISeat<IThreeCardPokerWager, IThreeCardPokerPayout>, dealer: IDealer): void => {
