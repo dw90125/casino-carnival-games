@@ -1,21 +1,21 @@
 import { CasinoGame } from "../../classes/casinogame.js";
 import { IGameConfig, IPlayerIntent, IHand, ISeat, IDealer } from "../../types/games/base.js";
-import { IThreeCardPokerWager, IThreeCardPokerPayout } from "../../types/games/three-card-poker.js";
-import { CactusKevConfig } from "../../evaluators/config/cactuskev/three-card-poker.js";
+import { IHighCardFlushWager, IHighCardFlushPayout } from "../../types/games/high-card-flush.js";
+import { BasicConfig } from "../../evaluators/config/basic/five-card-poker.js";
 import * as GameResolver from './resolvers.js';
 
-export class ThreeCardPoker extends CasinoGame<IThreeCardPokerWager, IThreeCardPokerPayout> {
+export class HighCardFlush extends CasinoGame<IHighCardFlushWager, IHighCardFlushPayout> {
     public static readonly gameConfig: IGameConfig = {
         numSeats: 6,
-        handSize: 3,
-        masterDeck: Object.keys(CactusKevConfig.DECK)
+        handSize: 7,
+        masterDeck: BasicConfig.DECK
     };
 
-    protected config: IGameConfig = ThreeCardPoker.gameConfig;
+    protected config: IGameConfig = HighCardFlush.gameConfig;
     protected dealer: IDealer;
-    protected seats: ISeat<IThreeCardPokerWager, IThreeCardPokerPayout>[] = [];
+    protected seats: ISeat<IHighCardFlushWager, IHighCardFlushPayout>[] = [];
 
-    constructor(intent: IPlayerIntent<IThreeCardPokerWager>) {
+    constructor(intent: IPlayerIntent<IHighCardFlushWager>) {
         super();
         
         this.dealer = this.createEmptyDealer();
@@ -34,11 +34,9 @@ export class ThreeCardPoker extends CasinoGame<IThreeCardPokerWager, IThreeCardP
     }
 
     protected deal(): void {
-        // deal only to occupied slots
+        // deal to ALL slots, taken or not!
         for (let i = 0; i < this.seats.length; i++) {
-            if (this.seats[i].taken) {
-                this.seats[i].hand.cards = this.shoe.splice(0, this.config.handSize);
-            }
+            this.seats[i].hand.cards = this.shoe.splice(0, this.config.handSize);
         }
 
         // lastly the dealer
@@ -56,9 +54,8 @@ export class ThreeCardPoker extends CasinoGame<IThreeCardPokerWager, IThreeCardP
                 this.seats[i].hand = GameResolver.evaluateHand(this.seats[i].hand);
 
                 GameResolver.play(this.seats[i], this.dealer);
-                GameResolver.pp(this.seats[i]);
-                GameResolver.six(this.seats[i], this.dealer);
-                GameResolver.prog(this.seats[i]);
+                GameResolver.flush(this.seats[i]);
+                GameResolver.sf(this.seats[i]);
             }
         }
     }
@@ -70,15 +67,15 @@ export class ThreeCardPoker extends CasinoGame<IThreeCardPokerWager, IThreeCardP
         cards: [], name: '', eqv: 9999
     });
 
-    protected createEmptyWager = (): IThreeCardPokerWager => ({
-        ante: 0, play: 0, pp: 0, six: 0, prog: 0
+    protected createEmptyWager = (): IHighCardFlushWager => ({
+        ante: 0, play: 0, flush: 0, sf: 0
     });
 
-    protected createEmptyPayout = (): IThreeCardPokerPayout => ({
-        ante: 0, play: 0, pp: 0, six: 0, prog: 0
+    protected createEmptyPayout = (): IHighCardFlushPayout => ({
+        ante: 0, play: 0, flush: 0, sf: 0
     });
 
-    protected createEmptySeat = (): ISeat<IThreeCardPokerWager, IThreeCardPokerPayout> => ({
+    protected createEmptySeat = (): ISeat<IHighCardFlushWager, IHighCardFlushPayout> => ({
         taken: false,
         player: false,
         hand: this.createEmptyHand(),

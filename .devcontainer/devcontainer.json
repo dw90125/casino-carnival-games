@@ -7,12 +7,13 @@
         "terminal.integrated.defaultProfile.linux": "bash"
       },
       "extensions": [
+        "ms-azuretools.vscode-containers",
         "dbaeumer.vscode-eslint",
-        "google.geminicodeassist",
-	      "pkief.material-icon-theme"
+        "PKief.material-icon-theme",
+        "GitHub.vscode-pull-request-github"
       ]
     }
   },
   "remoteUser": "node",
-  //"postCreateCommand": "npm install"
+  "postCreateCommand": "npm install"
 }

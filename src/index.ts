@@ -1,10 +1,13 @@
-import { select, number, confirm } from '@inquirer/prompts';
-import { displayOutcome } from './utilities/cli.js';
+import { select, number, confirm } from "@inquirer/prompts";
+import { displayOutcome } from "./utilities/cli.js";
 
-import { IPlayerIntent, IGameOutcome } from "./types/games/base.js";
+import { IPlayerIntent, IGameOutcome, IBaseWager } from "./types/games/base.js";
 
 import { IThreeCardPokerWager } from "./types/games/three-card-poker.js";
-import { ThreeCardPoker } from './games/three-card-poker/game.js';
+import { ThreeCardPoker } from "./games/three-card-poker/game.js";
+
+import { IHighCardFlushWager } from "./types/games/high-card-flush.js";
+import { HighCardFlush } from "./games/high-card-flush/game.js";
 
 async function ThreeCardPokerIntent(): Promise<IPlayerIntent<IThreeCardPokerWager>> {
     const numSeats = ThreeCardPoker.gameConfig.numSeats;
@@ -28,9 +31,10 @@ async function ThreeCardPokerIntent(): Promise<IPlayerIntent<IThreeCardPokerWage
     };
 }
 
-/*
 async function HighCardFlushIntent(): Promise<IPlayerIntent<IHighCardFlushWager>> {
-    const seatIndex = await number({ message: 'Select seat [1-7]:', min: 1, max: 7 }) ?? 1;
+    const numSeats = HighCardFlush.gameConfig.numSeats;
+    
+    const seatIndex = await number({ message: `Select seat [1-${numSeats}]:`, min: 1, max: numSeats, default: 1 }) ?? 1;
     const ante = await number({ message: 'Ante wager:', min: 5, max: 500 }) ?? 5;
     const flush = await number({ message: 'Flush Bonus wager:', default: 0 }) ?? 0;
     const sf = await number({ message: 'Straight-Flush Bonus wager:', default: 0 }) ?? 0;
@@ -42,11 +46,10 @@ async function HighCardFlushIntent(): Promise<IPlayerIntent<IHighCardFlushWager>
     };
 
     return {
-        seatIndex: seatIndex,
+        seatIndex: seatIndex - 1,
         wager: wager
     };
 }
-*/
 
 async function main() {
     console.clear();
@@ -60,25 +63,32 @@ async function main() {
         ],
     });
     
-    let playing = true;
-    let intent: any;
+    let game: ThreeCardPoker | HighCardFlush | undefined;
+    let intent: IPlayerIntent<IThreeCardPokerWager> | IPlayerIntent<IHighCardFlushWager> | undefined;
 
-    console.clear();
+    let bankroll = await number({ message: 'Starting Bankroll:', default: 500 }) ?? 500;
+    console.log(`Bankroll: $${bankroll}\n`);
+
     if (choice === 'TCP') {
-        let bankroll = await number({ message: 'Starting Bankroll:', default: 500 }) ?? 500;
+        intent = await ThreeCardPokerIntent();
+        game = new ThreeCardPoker(intent);
+    } else if (choice === 'HCF') {
+        intent = await HighCardFlushIntent();
+        game = new HighCardFlush(intent);
+    }        
 
-        console.log(`Bankroll: $${bankroll}\n`);
+    if (intent && game) {
+        let playing = true;
 
-        const intent = await ThreeCardPokerIntent();
-        const game = new ThreeCardPoker(intent);
-        
         while (playing) {
-            let wager = Object.values(intent.wager).reduce((sum, val) => sum + val, 0)            
+            let wager: number = Object.values(intent.wager as IBaseWager).reduce((sum, val) => sum + val, 0);            
 
             bankroll -= wager;
 
             game.play();
+
             const outcome: IGameOutcome = game.outcome();
+
             displayOutcome(outcome);
 
             bankroll += outcome.player.payout;
@@ -93,21 +103,12 @@ async function main() {
                 if (!repeat) break;
             }
         }
-    } else if (choice === 'HCF') {
-        console.log('Coming Soon!\n\n');
-        process.exit(1);
 
-        // const intent = await HighCardFlushIntent();
-        // const game = new HigCardFlush(intent);
-        // game.play();
-        // const outcome = game.outcome();
-        // displayOutcome(outcome);
+        console.log('Done\n\n');
     } else {
         console.log('Invalid Game\n\n');
         process.exit(1);
     }
-
-    console.log('Done\n\n');
 }
 
 main();

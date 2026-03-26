@@ -11,7 +11,7 @@ import { IBasicConfig } from "../../types/evaluators/ibasicconfig.js";
 export class BasicEvaluator {
     private config: IBasicConfig;
 
-    private hand: string[] = [];
+    private cards: string[] = [];
     private ranks: Record<string, number> = {};
     private suits: Record<string, number> = {};
     private matrix: Record<string, Record<string, number>> = {};
@@ -20,31 +20,31 @@ export class BasicEvaluator {
         this.config = config;
     }
 
-    public set_hand(hand: string[]): void {
-        this.hand = hand;
+    public set_cards(cards: string[]): void {
+        this.cards = cards;
 
         this.ranks = this.sort_ranks();
         this.suits = this.sort_suits();
         this.matrix = this.sort_matrix();
     }
 
-    public num_pairs():number {
+    public num_pairs(): number {
         return Object.values(this.ranks).filter(n => n === 2).length;
     }
 
-    public num_trips():number {
+    public num_trips(): number {
         return Object.values(this.ranks).filter(n => n === 3).length;
     }
 
-    public has_trips():boolean {
+    public has_trips(): boolean {
         return Object.values(this.ranks).includes(3);
     }
 
-    public has_quads():boolean {
+    public has_quads(): boolean {
         return Object.values(this.ranks).includes(4);
     }
 
-    public has_full_house():boolean {
+    public has_full_house(): boolean {
         const trips = this.num_trips();
         const pairs = this.num_pairs();
 
@@ -56,27 +56,26 @@ export class BasicEvaluator {
     // straights are where we get tough, especially with lots of cards (like 7).  a hand like A-9-8-7-6-5-2 is hard
     // to detect, and 5-4-3-2-A needs a special check.
 
-    public has_straight():boolean {
-        const hand_size = Math.min(this.hand.length, 5);
+    public has_straight(): boolean {
+        const hand_size = Math.min(this.cards.length, 5);
         const bits = this.config.RANKS.map(r => this.ranks[r] > 0 ? '1' : '0');
         bits.push(bits[0]); // for the ace-low straight.
 
         return bits.join('').includes('1'.repeat(hand_size));
     }
 
-
     //----------------------------------------------------------------------------------------------------------------------
     // flush is "kinda" easy.  If there are 5 cards or less, then the suit count must equal the card count.
     // if there are MORE than 5 cards, then one suit needs at least 5 to qualify:
-    public has_flush():boolean {
-        const hand_size = Math.min(this.hand.length, 5);
+    public has_flush(): boolean {
+        const hand_size = Math.min(this.cards.length, 5);
         return Object.values(this.suits).some(n => n >= hand_size);
     }
 
     //----------------------------------------------------------------------------------------------------------------------
     // straight flushes are harder than has_straight and has_flush, because of 7-card hands.  Imagine KC-QC-JC-TD-9C-4C-3S.  There's a straight and a flush there, but not a straight flush.
-    public has_straight_flush():boolean {
-        const hand_size = Math.min(this.hand.length, 5);
+    public has_straight_flush(): boolean {
+        const hand_size = Math.min(this.cards.length, 5);
 
         for (const [suit, ranks] of Object.entries(this.matrix)) {
             const bits = this.config.RANKS.map(r => ranks[r] > 0 ? '1' : '0');
@@ -90,8 +89,8 @@ export class BasicEvaluator {
 
     //----------------------------------------------------------------------------------------------------------------------
     // royal flushes may be the easiest.  you MUST have specific cards.
-    public has_royal_flush():boolean {
-        const hand_size = Math.min(this.hand.length, 5);
+    public has_royal_flush(): boolean {
+        const hand_size = Math.min(this.cards.length, 5);
 
         for (const [suit, ranks] of Object.entries(this.matrix)) {
             const bits = this.config.RANKS.map(r => ranks[r] > 0 ? '1' : '0');
@@ -103,6 +102,27 @@ export class BasicEvaluator {
     }
 
     //---------------------------------------------------------------------------------------------------------------------
+    // Suit "tokens" can be useful sometimes for some games:
+    public matrix_tokens(): Record<string, string> {
+        const tokens: Record<string, string> = {};
+
+        for (const [suit, ranks] of Object.entries(this.matrix)) {
+            tokens[suit] = this.config.RANKS.map(r => ranks[r] > 0 ? r : '').join('');
+        }
+
+        return tokens;
+    }
+
+    public matrix_bits(): Record<string, string> {
+        const bits: Record<string, string> = {};
+
+        for (const [suit, ranks] of Object.entries(this.matrix)) {
+            bits[suit] = this.config.RANKS.map(r => ranks[r] > 0 ? '1' : '0').join('');
+        }
+
+        return bits;
+    }
+
     //---------------------------------------------------------------------------------------------------------------------
 
     private sort_ranks(): Record<string, number> {
@@ -110,7 +130,7 @@ export class BasicEvaluator {
 
         this.config.RANKS.forEach(r => ranks[r] = 0);
 
-        for (const card of this.hand) {
+        for (const card of this.cards) {
             const r = card[0];
             if (r in ranks) ranks[r]++;
         }
@@ -123,7 +143,7 @@ export class BasicEvaluator {
 
         this.config.SUITS.forEach(s => suits[s] = 0);
 
-        for (const card of this.hand) {
+        for (const card of this.cards) {
             const s = card[1];
             if (s in suits) suits[s]++;
         }
@@ -139,10 +159,10 @@ export class BasicEvaluator {
             this.config.RANKS.forEach(r => matrix[s][r] = 0);
         });
 
-        for (const card of this.hand) {
+        for (const card of this.cards) {
             let r = card[0];
             let s = card[1];
-            
+
             if ((s in matrix) && (r in matrix[s])) {
                 matrix[s][r] += 1;
             }
