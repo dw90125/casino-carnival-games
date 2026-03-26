@@ -1,11 +1,11 @@
 # Project: Casino Carnival Games (TypeScript)
 
-A high-performance implementation of the **Cactus Kev Poker Evaluation Algorithm**, specifically ported and optimized for the popular casino game **3-card poker**. This project demonstrates the migration of legacy C-style bitwise logic into a modern, type-safe **TypeScript** environment.
+A high-performance implementation of the **Cactus Kev Poker Evaluation Algorithm**, specifically ported and optimized for popular casino games like **3-card poker** and **High-Card Flush**. This project demonstrates the migration of legacy C-style bitwise logic into a modern, type-safe **TypeScript** environment.
 
 ## 🚀 Technical Highlights
 * **Legacy Migration:** Successfully ported the classic 32-bit integer card scheme to a modern Node.js/TS architecture.
 * **Bit-Level Evaluation:** Utilizes a prime-product lookup system and rank bitmasking for O(1) evaluation speed.
-* **Custom Hierarchy:** Engineered specifically for 3-card poker rules where **Straight > Flush**.
+* **Custom Hierarchy:** Engineered specifically for each game's use of decks and rules.
 * **Test-Driven Development:** Full test suite using **Vitest** to verify edge cases like the "Wheel" (A-2-3 straight).
 
 ## 🛠 The "Cactus Kev" Architecture
@@ -38,6 +38,9 @@ xxxAKQJT 98765432 CDHSrrrr xxpppppp
 1. **Bitmask Check:** The engine intercepts Straights and Flushes via the rank bitmask (q_val).
 2. **Prime Product:** For Pairs and High Cards, the engine calculates a unique prime product (p_val).
 3. **Perfect Hash Lookup:** This product is mapped to a pre-calculated index for an immediate rank.
+
+### Alternate Evaluation Engines
+Some games and/or side-wagers can benefit from direct evaluation versus the CactusKev approach.  In those cases an extensible _BasicEvaluator_ can be utilized to quickly dissect a hand and determine outcomes.
 
 ## 💻 Environment & Tools
 * **Runtime:** Node.js
