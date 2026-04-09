@@ -1,4 +1,4 @@
-import { IGameConfig, IBaseWager, IBasePayout, IBaseHand, ISeat, IDealer, IGameOutcome } from "@/types/games/base";
+import { IGameConfig, IBaseWager, IBasePayout, IBaseHand, ISeat, IDealer, IGameOutcome } from "../types/games/base.js";
 
 export abstract class CasinoGame<H extends IBaseHand, T extends IBaseWager, P extends IBasePayout> {
     protected abstract config: IGameConfig;

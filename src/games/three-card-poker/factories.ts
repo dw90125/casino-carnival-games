@@ -1,5 +1,5 @@
-import { ISeat, IDealer } from "@/types/games/base";
-import { IThreeCardPokerHand, IThreeCardPokerWager, IThreeCardPokerPayout } from "@/types/games/three-card-poker";
+import { ISeat, IDealer } from "../../types/games/base.js";
+import { IThreeCardPokerHand, IThreeCardPokerWager, IThreeCardPokerPayout } from "../../types/games/three-card-poker.js";
 
 const createEmptyHand = (): IThreeCardPokerHand => ({
     cards: [], name: '', eqv: 9999

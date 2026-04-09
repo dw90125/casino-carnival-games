@@ -1,9 +1,9 @@
-import { ISeat, IDealer } from "@/types/games/base";
-import { IThreeCardPokerHand, IThreeCardPokerWager, IThreeCardPokerPayout } from "@/types/games/three-card-poker";
+import { ISeat, IDealer } from "../../types/games/base.js";
+import { IThreeCardPokerHand, IThreeCardPokerWager, IThreeCardPokerPayout } from "../../types/games/three-card-poker.js";
 
-import { CactusKevEvaluator } from "@/evaluators/cactuskev/engine";
-import { Enums as CactusKevEnums3 } from "@/enums/three-card-poker";
-import { Enums as CactusKevEnums5 } from "@/enums/five-card-poker";
+import { CactusKevEvaluator } from "../../evaluators/cactuskev/engine.js";
+import { Enums as CactusKevEnums3 } from "../../enums/three-card-poker.js";
+import { Enums as CactusKevEnums5 } from "../../enums/five-card-poker.js";
 
 const evaluateHand = (hand: IThreeCardPokerHand): IThreeCardPokerHand => {
 	const cactuskev3 = new CactusKevEvaluator(CactusKevEnums3);

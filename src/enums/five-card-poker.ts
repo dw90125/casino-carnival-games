@@ -4,7 +4,7 @@
 * 
 * https://en.wikipedia.org/wiki/List_of_poker_hands
 */
-import { ICactusKevEnums } from "@/types/enums/icactuskev";
+import { ICactusKevEnums } from "../types/enums/icactuskev.js";
 
 /*
 * this is a table lookup for all "flush" hands (e.g. both

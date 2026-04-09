@@ -1,8 +1,8 @@
-import { ISeat, IDealer } from "@/types/games/base";
-import { IHighCardFlushHand, IHighCardFlushWager, IHighCardFlushPayout } from "@/types/games/high-card-flush";
+import { ISeat, IDealer } from "../../types/games/base.js";
+import { IHighCardFlushHand, IHighCardFlushWager, IHighCardFlushPayout } from "../../types/games/high-card-flush.js";
 
-import { BasicEvaluator } from "@/evaluators/basic/engine";
-import { Enums as HCFEnums } from  "@/enums/high-card-flush";
+import { BasicEvaluator } from "../../evaluators/basic/engine.js";
+import { Enums as HCFEnums } from  "../../enums/high-card-flush.js";
 
 const evaluateHand = (hand: IHighCardFlushHand): IHighCardFlushHand => {
     const basicev = new BasicEvaluator(hand.cards);

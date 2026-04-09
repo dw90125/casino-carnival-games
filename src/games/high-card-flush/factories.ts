@@ -1,5 +1,5 @@
-import { ISeat, IDealer } from "@/types/games/base";
-import { IHighCardFlushHand, IHighCardFlushWager, IHighCardFlushPayout } from "@/types/games/high-card-flush";
+import { ISeat, IDealer } from "../../types/games/base.js";
+import { IHighCardFlushHand, IHighCardFlushWager, IHighCardFlushPayout } from "../../types/games/high-card-flush.js";
 
 const createEmptyHand = (): IHighCardFlushHand => ({
     cards: [], name: '', eqv: 9999

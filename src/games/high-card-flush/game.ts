@@ -1,9 +1,9 @@
-import { CasinoGame } from "@/classes/casinogame";
-import { IGameConfig, IPlayerIntent, ISeat, IDealer } from "@/types/games/base";
-import { IHighCardFlushHand, IHighCardFlushWager, IHighCardFlushPayout } from "@/types/games/high-card-flush";
-import { DECK } from "@/decks/52-card";
-import { GameResolvers } from './resolvers';
-import { GameFactories } from './factories';
+import { CasinoGame } from "../../classes/casinogame.js";
+import { IGameConfig, IPlayerIntent, ISeat, IDealer } from "../../types/games/base.js";
+import { IHighCardFlushHand, IHighCardFlushWager, IHighCardFlushPayout } from "../../types/games/high-card-flush.js";
+import { DECK } from "../../decks/52-card.js";
+import { GameResolvers } from "./resolvers.js";
+import { GameFactories } from "./factories.js";
 
 export class HighCardFlush extends CasinoGame<IHighCardFlushHand, IHighCardFlushWager, IHighCardFlushPayout> {
     public static readonly gameConfig: IGameConfig = {

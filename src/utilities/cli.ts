@@ -1,4 +1,4 @@
-import { IBaseWager, IBasePayout, IGameOutcome } from "@/types/games/base";
+import { IBaseWager, IBasePayout, IGameOutcome } from "../types/games/base.js";
 
 const sortHand = (cards: string[]): string[] => {
     const sorted: string[] = [];

@@ -1,13 +1,13 @@
 import { select, number, confirm } from "@inquirer/prompts";
-import { displayOutcome } from "./utilities/cli";
+import { displayOutcome } from "./utilities/cli.js";
 
-import { IPlayerIntent, IGameOutcome, IBaseWager } from "./types/games/base";
+import { IPlayerIntent, IGameOutcome, IBaseWager } from "./types/games/base.js";
 
-import { IThreeCardPokerWager } from "./types/games/three-card-poker";
-import { ThreeCardPoker } from "./games/three-card-poker/game";
+import { IThreeCardPokerWager } from "./types/games/three-card-poker.js";
+import { ThreeCardPoker } from "./games/three-card-poker/game.js";
 
-import { IHighCardFlushWager } from "./types/games/high-card-flush";
-import { HighCardFlush } from "./games/high-card-flush/game";
+import { IHighCardFlushWager } from "./types/games/high-card-flush.js";
+import { HighCardFlush } from "./games/high-card-flush/game.js";
 
 async function ThreeCardPokerIntent(): Promise<IPlayerIntent<IThreeCardPokerWager>> {
     const numSeats = ThreeCardPoker.gameConfig.numSeats;
@@ -35,7 +35,7 @@ async function HighCardFlushIntent(): Promise<IPlayerIntent<IHighCardFlushWager>
     const numSeats = HighCardFlush.gameConfig.numSeats;
     
     const seatIndex = await number({ message: `Select seat [1-${numSeats}]:`, min: 1, max: numSeats, default: 1 }) ?? 1;
-    const ante = await number({ message: 'Ante wager:', min: 5, max: 500 }) ?? 5;
+    const ante = await number({ message: 'Ante wager:', min: 5, max: 500, default: 5}) ?? 5;
     const flush = await number({ message: 'Flush Bonus wager:', default: 0 }) ?? 0;
     const sf = await number({ message: 'Straight-Flush Bonus wager:', default: 0 }) ?? 0;
 

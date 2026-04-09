@@ -29,7 +29,7 @@
 * lookups are used for straights and flushes, which are much simpler to evaluate.
 */
 
-import { ICactusKevEnums } from "@/types/enums/icactuskev";
+import { ICactusKevEnums } from "../../types/enums/icactuskev.js";
 
 export class CactusKevEvaluator {
   private readonly CARD_VALUES: Record<string, number> = {

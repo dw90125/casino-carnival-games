@@ -1,9 +1,9 @@
-import { CasinoGame } from "@/classes/casinogame";
-import { IGameConfig, IPlayerIntent, ISeat, IDealer } from "@/types/games/base";
-import { IThreeCardPokerHand, IThreeCardPokerWager, IThreeCardPokerPayout } from "@/types/games/three-card-poker";
-import { DECK } from "@/decks/52-card";
-import { GameResolvers } from './resolvers';
-import { GameFactories } from './factories';
+import { CasinoGame } from "../../classes/casinogame.js";
+import { IGameConfig, IPlayerIntent, ISeat, IDealer } from "../../types/games/base.js";
+import { IThreeCardPokerHand, IThreeCardPokerWager, IThreeCardPokerPayout } from "../../types/games/three-card-poker.js";
+import { DECK } from "../../decks/52-card.js";
+import { GameResolvers } from "./resolvers.js";
+import { GameFactories } from "./factories.js";
 
 export class ThreeCardPoker extends CasinoGame<IThreeCardPokerHand, IThreeCardPokerWager, IThreeCardPokerPayout> {
     public static readonly gameConfig: IGameConfig = {

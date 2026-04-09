@@ -5,7 +5,7 @@
 * 
 * https://wizardofodds.com/games/high-card-flush/
 */
-import { IHighCardFlushEnums } from "@/types/enums/ihighcardflush";
+import { IHighCardFlushEnums } from "../types/enums/ihighcardflush.js";
 
 /*
 * this is a table lookup for all "flush" hands (e.g. both flushes and straight-flushes)
