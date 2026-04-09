@@ -1,27 +1,28 @@
-import { CasinoGame } from "../../classes/casinogame.js";
-import { IGameConfig, IPlayerIntent, IHand, ISeat, IDealer } from "../../types/games/base.js";
-import { IThreeCardPokerWager, IThreeCardPokerPayout } from "../../types/games/three-card-poker.js";
-import { CactusKevConfig } from "../../evaluators/config/cactuskev/three-card-poker.js";
-import * as GameResolver from './resolvers.js';
+import { CasinoGame } from "@/classes/casinogame";
+import { IGameConfig, IPlayerIntent, ISeat, IDealer } from "@/types/games/base";
+import { IThreeCardPokerHand, IThreeCardPokerWager, IThreeCardPokerPayout } from "@/types/games/three-card-poker";
+import { DECK } from "@/decks/52-card";
+import { GameResolvers } from './resolvers';
+import { GameFactories } from './factories';
 
-export class ThreeCardPoker extends CasinoGame<IThreeCardPokerWager, IThreeCardPokerPayout> {
+export class ThreeCardPoker extends CasinoGame<IThreeCardPokerHand, IThreeCardPokerWager, IThreeCardPokerPayout> {
     public static readonly gameConfig: IGameConfig = {
         numSeats: 6,
         handSize: 3,
-        masterDeck: Object.keys(CactusKevConfig.DECK)
+        masterDeck: DECK
     };
 
     protected config: IGameConfig = ThreeCardPoker.gameConfig;
-    protected dealer: IDealer;
-    protected seats: ISeat<IThreeCardPokerWager, IThreeCardPokerPayout>[] = [];
+    protected dealer: IDealer<IThreeCardPokerHand>;
+    protected seats: ISeat<IThreeCardPokerHand, IThreeCardPokerWager, IThreeCardPokerPayout>[] = [];
 
     constructor(intent: IPlayerIntent<IThreeCardPokerWager>) {
         super();
         
-        this.dealer = this.createEmptyDealer();
+        this.dealer = GameFactories.createEmptyDealer();
 
         for (let i = 0; i < this.config.numSeats; i++) {
-            this.seats[i] = this.createEmptySeat();
+            this.seats[i] = GameFactories.createEmptySeat();
 
             if (i == intent.seatIndex) {
                 this.seats[i].taken = true;
@@ -47,48 +48,19 @@ export class ThreeCardPoker extends CasinoGame<IThreeCardPokerWager, IThreeCardP
 
     protected resolve():void {
         // evaluate the dealer first.
-        this.dealer.hand = GameResolver.evaluateHand(this.dealer.hand);
-        this.dealer.qualify = GameResolver.dealerQualifies(this.dealer.hand);
+        this.dealer.hand = GameResolvers.evaluateHand(this.dealer.hand);
+        this.dealer.qualify = GameResolvers.dealerQualifies(this.dealer.hand);
 
         // now each "taken" seat.
         for (let i = 0; i < this.seats.length; i++) {
             if (this.seats[i].taken) {
-                this.seats[i].hand = GameResolver.evaluateHand(this.seats[i].hand);
+                this.seats[i].hand = GameResolvers.evaluateHand(this.seats[i].hand);
 
-                GameResolver.play(this.seats[i], this.dealer);
-                GameResolver.pp(this.seats[i]);
-                GameResolver.six(this.seats[i], this.dealer);
-                GameResolver.prog(this.seats[i]);
+                GameResolvers.play(this.seats[i], this.dealer);
+                GameResolvers.pp(this.seats[i]);
+                GameResolvers.six(this.seats[i], this.dealer);
+                GameResolvers.prog(this.seats[i]);
             }
         }
     }
-
-    // ------------------------------------------------------------------------------------------------
-    // FACTORIES
-
-    protected createEmptyHand = (): IHand => ({
-        cards: [], name: '', eqv: 9999
-    });
-
-    protected createEmptyWager = (): IThreeCardPokerWager => ({
-        ante: 0, play: 0, pp: 0, six: 0, prog: 0
-    });
-
-    protected createEmptyPayout = (): IThreeCardPokerPayout => ({
-        ante: 0, play: 0, pp: 0, six: 0, prog: 0
-    });
-
-    protected createEmptySeat = (): ISeat<IThreeCardPokerWager, IThreeCardPokerPayout> => ({
-        taken: false,
-        player: false,
-        hand: this.createEmptyHand(),
-        wager: this.createEmptyWager(),
-        payout: this.createEmptyPayout(),
-        result: ''
-    });
-
-    protected createEmptyDealer = (): IDealer => ({
-        hand: this.createEmptyHand(),
-        qualify: false
-    });
 }

@@ -1,13 +1,13 @@
 import { select, number, confirm } from "@inquirer/prompts";
-import { displayOutcome } from "./utilities/cli.js";
+import { displayOutcome } from "./utilities/cli";
 
-import { IPlayerIntent, IGameOutcome, IBaseWager } from "./types/games/base.js";
+import { IPlayerIntent, IGameOutcome, IBaseWager } from "./types/games/base";
 
-import { IThreeCardPokerWager } from "./types/games/three-card-poker.js";
-import { ThreeCardPoker } from "./games/three-card-poker/game.js";
+import { IThreeCardPokerWager } from "./types/games/three-card-poker";
+import { ThreeCardPoker } from "./games/three-card-poker/game";
 
-import { IHighCardFlushWager } from "./types/games/high-card-flush.js";
-import { HighCardFlush } from "./games/high-card-flush/game.js";
+import { IHighCardFlushWager } from "./types/games/high-card-flush";
+import { HighCardFlush } from "./games/high-card-flush/game";
 
 async function ThreeCardPokerIntent(): Promise<IPlayerIntent<IThreeCardPokerWager>> {
     const numSeats = ThreeCardPoker.gameConfig.numSeats;
@@ -91,7 +91,7 @@ async function main() {
 
             displayOutcome(outcome);
 
-            bankroll += outcome.player.payout;
+            bankroll += outcome.player.payout.total;
 
             console.log(`Bankroll: $${bankroll}\n\n`);
 

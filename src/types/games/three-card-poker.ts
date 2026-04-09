@@ -1,4 +1,8 @@
-import { IBaseWager, IBasePayout, IHand, ISeat, IDealer, IGameOutcome } from "./base.js";
+import { IBaseWager, IBasePayout, IBaseHand } from "./base";
+
+export interface IThreeCardPokerHand extends IBaseHand {
+    eqv: number;
+}
 
 export interface IThreeCardPokerWager extends IBaseWager {
     ante: number;

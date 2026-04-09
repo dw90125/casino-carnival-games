@@ -10,10 +10,10 @@ describe('Three Card Poker - Payout Logic', () => {
         };
 
         const game = new ThreeCardPoker(intent);
-
-        game.play();
-
+        
         const internal = game as any;
+        
+        internal.play();
 
         internal.dealer.hand.cards = ['4H', '7D', '9C'];
 
@@ -33,9 +33,9 @@ describe('Three Card Poker - Payout Logic', () => {
 
         const game = new ThreeCardPoker(intent);
 
-        game.play();
-        
         const internal = game as any;
+        
+        internal.play();
 
         internal.dealer.hand.cards = ['JS', 'TS', '9H']; // 9H is a throwaway
 

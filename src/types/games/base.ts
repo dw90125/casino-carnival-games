@@ -8,21 +8,20 @@ export interface IBaseWager {}
 
 export interface IBasePayout {}
 
-export interface IHand {
+export interface IBaseHand {
     cards: string[];
     name: string;
-    eqv: number;
 }
 
-export interface IDealer {
-    hand: IHand;
+export interface IDealer<H extends IBaseHand> {
+    hand: H;
     qualify: boolean;
 }
 
-export interface ISeat<T extends IBaseWager, P extends IBasePayout> {
+export interface ISeat<H extends IBaseHand, T extends IBaseWager, P extends IBasePayout> {
     taken: boolean;
     player: boolean;
-    hand: IHand;
+    hand: H;
     wager: T;
     payout: P;
     result:string;
@@ -43,6 +42,6 @@ export interface IGameOutcome {
         cards: string[];
         name: string;
         result: string;
-        payout: number;
+        payout: {base: number, bonus: number, total: number};
     }
 }

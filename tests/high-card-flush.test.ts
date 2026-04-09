@@ -11,9 +11,9 @@ describe('High Card Flush - Payout Logic', () => {
 
         const game = new HighCardFlush(intent);
 
-        game.play();
-
         const internal = game as any;
+        
+        internal.play();
 
         internal.dealer.hand.cards = ["KC", "QC", "JC", "TD", "9C", "4C", "3D"];
 
@@ -33,9 +33,9 @@ describe('High Card Flush - Payout Logic', () => {
 
         const game = new HighCardFlush(intent);
 
-        game.play();
-
         const internal = game as any;
+        
+        internal.play();
 
         internal.dealer.hand.cards = ["KC", "QC", "JC", "TD", "9C", "4C", "3D"];
 
@@ -55,9 +55,9 @@ describe('High Card Flush - Payout Logic', () => {
 
         const game = new HighCardFlush(intent);
 
-        game.play();
-
         const internal = game as any;
+        
+        internal.play();
 
         internal.seats[0].hand.cards = ["KC", "AS", "2S", "3S", "4S", "9H", "7D"];
 
@@ -75,9 +75,9 @@ describe('High Card Flush - Payout Logic', () => {
 
         const game = new HighCardFlush(intent);
 
-        game.play();
-
         const internal = game as any;
+        
+        internal.play();
 
         internal.seats[0].hand.cards = ["KC", "AC", "2S", "3S", "4S", "QC", "JC"];
 
