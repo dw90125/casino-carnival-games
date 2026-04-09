@@ -1,28 +1,27 @@
-import { IHand, ISeat, IDealer } from "../../types/games/base.js";
-import { IThreeCardPokerWager, IThreeCardPokerPayout } from "../../types/games/three-card-poker.js";
+import { ISeat, IDealer } from "../../types/games/base.js";
+import { IThreeCardPokerHand, IThreeCardPokerWager, IThreeCardPokerPayout } from "../../types/games/three-card-poker.js";
 
-import { CactusKevEvaluator } from "../../evaluators/engines/cactuskev.js";
-import { CactusKevConfig as CactusKevConfig3, CactusKevHandName as CactusKevHandName3} from "../../evaluators/config/cactuskev/three-card-poker.js";
-import { CactusKevConfig as CactusKevConfig5} from "../../evaluators/config/cactuskev/five-card-poker.js";
+import { CactusKevEvaluator } from "../../evaluators/cactuskev/engine.js";
+import { Enums as CactusKevEnums3 } from "../../enums/three-card-poker.js";
+import { Enums as CactusKevEnums5 } from "../../enums/five-card-poker.js";
 
-const cactuskev3 = new CactusKevEvaluator(CactusKevConfig3);
-const cactuskev5 = new CactusKevEvaluator(CactusKevConfig5);
+const evaluateHand = (hand: IThreeCardPokerHand): IThreeCardPokerHand => {
+	const cactuskev3 = new CactusKevEvaluator(CactusKevEnums3);
 
-export const evaluateHand = (hand: IHand): IHand => {
     const eqv = cactuskev3.evaluate(hand.cards);
 
     return {
         ...hand,
-        name: CactusKevHandName3(eqv),
+        name: CactusKevEnums3.HAND_NAMES(eqv),
         eqv: eqv
     };
 };
 
-export const dealerQualifies = (hand: IHand): boolean => {
+const dealerQualifies = (hand: IThreeCardPokerHand): boolean => {
     return (hand.eqv <= 629); // Q-3-2 or better
 };
 
-export const play = (seat: ISeat<IThreeCardPokerWager, IThreeCardPokerPayout>, dealer: IDealer): void => {
+const play = (seat: ISeat<IThreeCardPokerHand, IThreeCardPokerWager, IThreeCardPokerPayout>, dealer: IDealer<IThreeCardPokerHand>): void => {
     // first, is this hand worthy of play at all?
     // from wizardofodds.com:
     // 1. Make raise with Q-6-4 or higher.
@@ -64,7 +63,7 @@ export const play = (seat: ISeat<IThreeCardPokerWager, IThreeCardPokerPayout>, d
     }
 };
 
-export const pp = (seat: ISeat<IThreeCardPokerWager, IThreeCardPokerPayout>): void => {
+const pp = (seat: ISeat<IThreeCardPokerHand, IThreeCardPokerWager, IThreeCardPokerPayout>): void => {
     seat.payout.pp = 0;
 
     if (seat.hand.eqv > 0) {
@@ -82,7 +81,9 @@ export const pp = (seat: ISeat<IThreeCardPokerWager, IThreeCardPokerPayout>): vo
     }
 }
 
-export const six = (seat: ISeat<IThreeCardPokerWager, IThreeCardPokerPayout>, dealer: IDealer): void => {
+const six = (seat: ISeat<IThreeCardPokerHand, IThreeCardPokerWager, IThreeCardPokerPayout>, dealer: IDealer<IThreeCardPokerHand>): void => {
+    const cactuskev5 = new CactusKevEvaluator(CactusKevEnums5);
+
     seat.payout.six = 0;
     
     const six_card_hand = [...seat.hand.cards, ...dealer.hand.cards];
@@ -115,7 +116,7 @@ export const six = (seat: ISeat<IThreeCardPokerWager, IThreeCardPokerPayout>, de
     }
 }
 
-export const prog = (seat: ISeat<IThreeCardPokerWager, IThreeCardPokerPayout>): void => {
+export const prog = (seat: ISeat<IThreeCardPokerHand, IThreeCardPokerWager, IThreeCardPokerPayout>): void => {
     //TODO: many progressives have an "envy" for the jackpot wagers.  I haven't added that yet.
     seat.payout.prog = 0;
 
@@ -136,3 +137,11 @@ export const prog = (seat: ISeat<IThreeCardPokerWager, IThreeCardPokerPayout>): 
     }
 }
 
+export const GameResolvers = {
+    evaluateHand,
+    dealerQualifies,
+    play,
+    pp,
+    six,
+    prog
+};

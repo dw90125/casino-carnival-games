@@ -35,7 +35,7 @@ async function HighCardFlushIntent(): Promise<IPlayerIntent<IHighCardFlushWager>
     const numSeats = HighCardFlush.gameConfig.numSeats;
     
     const seatIndex = await number({ message: `Select seat [1-${numSeats}]:`, min: 1, max: numSeats, default: 1 }) ?? 1;
-    const ante = await number({ message: 'Ante wager:', min: 5, max: 500 }) ?? 5;
+    const ante = await number({ message: 'Ante wager:', min: 5, max: 500, default: 5}) ?? 5;
     const flush = await number({ message: 'Flush Bonus wager:', default: 0 }) ?? 0;
     const sf = await number({ message: 'Straight-Flush Bonus wager:', default: 0 }) ?? 0;
 
@@ -91,7 +91,7 @@ async function main() {
 
             displayOutcome(outcome);
 
-            bankroll += outcome.player.payout;
+            bankroll += outcome.player.payout.total;
 
             console.log(`Bankroll: $${bankroll}\n\n`);
 

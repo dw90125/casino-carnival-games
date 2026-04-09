@@ -4,19 +4,7 @@
 * 
 * https://en.wikipedia.org/wiki/List_of_poker_hands
 */
-import { ICactusKevConfig } from "../../../types/evaluators/icactuskevconfig.js";
-
-/*
-* Five-Card Poker uses one standard 52-card deck.  The CactusKev values for each card
-* are precalculated below, and used for hand evaluation.
-*/
-
-const DECK: Record<string, number> = {
-  "AS": 0x10001C29, "KS": 0x08001B25, "QS": 0x04001A1F, "JS": 0x0200191D, "TS": 0x01001817, "9S": 0x00801713, "8S": 0x00401611, "7S": 0x0020150D, "6S": 0x0010140B, "5S": 0x00081307, "4S": 0x00041205, "3S": 0x00021103, "2S": 0x00011002,
-  "AH": 0x10002C29, "KH": 0x08002B25, "QH": 0x04002A1F, "JH": 0x0200291D, "TH": 0x01002817, "9H": 0x00802713, "8H": 0x00402611, "7H": 0x0020250D, "6H": 0x0010240B, "5H": 0x00082307, "4H": 0x00042205, "3H": 0x00022103, "2H": 0x00012002,
-  "AD": 0x10004C29, "KD": 0x08004B25, "QD": 0x04004A1F, "JD": 0x0200491D, "TD": 0x01004817, "9D": 0x00804713, "8D": 0x00404611, "7D": 0x0020450D, "6D": 0x0010440B, "5D": 0x00084307, "4D": 0x00044205, "3D": 0x00024103, "2D": 0x00014002,
-  "AC": 0x10008C29, "KC": 0x08008B25, "QC": 0x04008A1F, "JC": 0x0200891D, "TC": 0x01008817, "9C": 0x00808713, "8C": 0x00408611, "7C": 0x0020850D, "6C": 0x0010840B, "5C": 0x00088307, "4C": 0x00048205, "3C": 0x00028103, "2C": 0x00018002
-};
+import { ICactusKevEnums } from "../types/enums/icactuskev.js";
 
 /*
 * this is a table lookup for all "flush" hands (e.g. both
@@ -1954,15 +1942,7 @@ const VALUES: number[] = [
 1676, 14, 168, 2469, 2468, 1611, 23, 1610, 13, 179, 12, 167, 11
 ];
 
-export const CactusKevConfig: ICactusKevConfig = {
-  DECK,
-  FLUSHES,
-  UNIQUES,
-  PRODUCTS,
-  VALUES
-};
-
-export const CactusKevHandName = (eqv: number): string => {
+const HAND_NAMES = (eqv: number): string => {
   if (eqv == 1) return "Royal Flush";
   if (eqv <= 10) return "Straight Flush";
   if (eqv <= 166) return "Four of a Kind";
@@ -1973,4 +1953,12 @@ export const CactusKevHandName = (eqv: number): string => {
   if (eqv <= 3325) return "Two Pair";
   if (eqv <= 6185) return "Pair";
   return "High Card";
+};
+
+export const Enums: ICactusKevEnums = {
+  FLUSHES,
+  UNIQUES,
+  PRODUCTS,
+  VALUES,
+  HAND_NAMES
 };

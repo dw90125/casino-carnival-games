@@ -1,22 +1,19 @@
-import { IHand, ISeat, IDealer } from "../../types/games/base.js";
-import { IHighCardFlushWager, IHighCardFlushPayout } from "../../types/games/high-card-flush.js";
+import { ISeat, IDealer } from "../../types/games/base.js";
+import { IHighCardFlushHand, IHighCardFlushWager, IHighCardFlushPayout } from "../../types/games/high-card-flush.js";
 
-import { BasicEvaluator } from "../../evaluators/engines/basic.js";
-import { BasicConfig } from "../../evaluators/config/basic/five-card-poker.js";
-import { FLUSHES } from "../../evaluators/config/basic/high-card-flush.js";
+import { BasicEvaluator } from "../../evaluators/basic/engine.js";
+import { Enums as HCFEnums } from  "../../enums/high-card-flush.js";
 
-const basicev = new BasicEvaluator(BasicConfig);
+const evaluateHand = (hand: IHighCardFlushHand): IHighCardFlushHand => {
+    const basicev = new BasicEvaluator(hand.cards);
 
-export const evaluateHand = (hand: IHand): IHand => {
     let best_eqv: number = 9999;
     let best_len: number = 0; // really you'll never have worse than a two-card flush, though.
 
-    basicev.set_cards(hand.cards);
+    const suit_tokens: Record<string, string> = basicev.suit_tokens();
 
-    const matrix_tokens: Record<string, string> = basicev.matrix_tokens();
-
-    for (const token of Object.values(matrix_tokens)) {
-        const eqv = FLUSHES.indexOf(token);
+    for (const token of Object.values(suit_tokens)) {
+        const eqv = HCFEnums.FLUSHES.indexOf(token);
         if ((eqv > -1) && (eqv < best_eqv)) {
             best_eqv = eqv;
             best_len = token.length;
@@ -30,11 +27,11 @@ export const evaluateHand = (hand: IHand): IHand => {
     };
 };
 
-export const dealerQualifies = (hand: IHand): boolean => {
+const dealerQualifies = (hand: IHighCardFlushHand): boolean => {
     return (hand.eqv <= 5684); // 9-3-2 or better
 };
 
-export const play = (seat: ISeat<IHighCardFlushWager, IHighCardFlushPayout>, dealer: IDealer): void => {
+const play = (seat: ISeat<IHighCardFlushHand, IHighCardFlushWager, IHighCardFlushPayout>, dealer: IDealer<IHighCardFlushHand>): void => {
     // first, is this hand worthy of play at all?
     // from wizardofodds.com:
     // 1. Make raise with T-8-6 flush or better.
@@ -73,7 +70,7 @@ export const play = (seat: ISeat<IHighCardFlushWager, IHighCardFlushPayout>, dea
     }
 };
 
-export const flush = (seat: ISeat<IHighCardFlushWager, IHighCardFlushPayout>): void => {
+const flush = (seat: ISeat<IHighCardFlushHand, IHighCardFlushWager, IHighCardFlushPayout>): void => {
     seat.payout.flush = 0;
 
     if (seat.hand.eqv >= 0) {
@@ -89,7 +86,9 @@ export const flush = (seat: ISeat<IHighCardFlushWager, IHighCardFlushPayout>): v
     }
 }
 
-export const sf = (seat: ISeat<IHighCardFlushWager, IHighCardFlushPayout>): void => {
+const sf = (seat: ISeat<IHighCardFlushHand, IHighCardFlushWager, IHighCardFlushPayout>): void => {
+    const basicev = new BasicEvaluator(seat.hand.cards);
+    
     // the "straight-flush bonus" doesn't really care about the larger game.
     // if your hand has a straight-flush of 3 or more, then you get the bonus,
     // even if you FOLD the hand.
@@ -105,11 +104,9 @@ export const sf = (seat: ISeat<IHighCardFlushWager, IHighCardFlushPayout>): void
         { len: 3, mult: 8 }
     ] as const;
 
-    basicev.set_cards(seat.hand.cards);
+    const suit_bits: Record<string, string> = basicev.suit_bits();
 
-    const matrix_bits: Record<string, string> = basicev.matrix_bits();
-
-    const bitStrings = Object.values(matrix_bits);
+    const bitStrings = Object.values(suit_bits);
     const winningTier = PAYOUTS.find(({ len }) => 
         // since an Ace can be part of both Ace-high and Ace-low straights, copy its bit to the end for efficiency
         bitStrings.some(bits => (bits + bits.charAt(0)).includes('1'.repeat(len)))
@@ -119,3 +116,11 @@ export const sf = (seat: ISeat<IHighCardFlushWager, IHighCardFlushPayout>): void
         seat.payout.sf = seat.wager.sf * winningTier.mult;
     }
 }
+
+export const GameResolvers = {
+    evaluateHand,
+    dealerQualifies,
+    play,
+    flush,
+    sf
+};

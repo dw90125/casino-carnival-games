@@ -1,27 +1,28 @@
 import { CasinoGame } from "../../classes/casinogame.js";
-import { IGameConfig, IPlayerIntent, IHand, ISeat, IDealer } from "../../types/games/base.js";
-import { IHighCardFlushWager, IHighCardFlushPayout } from "../../types/games/high-card-flush.js";
-import { BasicConfig } from "../../evaluators/config/basic/five-card-poker.js";
-import * as GameResolver from './resolvers.js';
+import { IGameConfig, IPlayerIntent, ISeat, IDealer } from "../../types/games/base.js";
+import { IHighCardFlushHand, IHighCardFlushWager, IHighCardFlushPayout } from "../../types/games/high-card-flush.js";
+import { DECK } from "../../decks/52-card.js";
+import { GameResolvers } from "./resolvers.js";
+import { GameFactories } from "./factories.js";
 
-export class HighCardFlush extends CasinoGame<IHighCardFlushWager, IHighCardFlushPayout> {
+export class HighCardFlush extends CasinoGame<IHighCardFlushHand, IHighCardFlushWager, IHighCardFlushPayout> {
     public static readonly gameConfig: IGameConfig = {
         numSeats: 6,
         handSize: 7,
-        masterDeck: BasicConfig.DECK
+        masterDeck: DECK
     };
 
     protected config: IGameConfig = HighCardFlush.gameConfig;
-    protected dealer: IDealer;
-    protected seats: ISeat<IHighCardFlushWager, IHighCardFlushPayout>[] = [];
+    protected dealer: IDealer<IHighCardFlushHand>;
+    protected seats: ISeat<IHighCardFlushHand, IHighCardFlushWager, IHighCardFlushPayout>[] = [];
 
     constructor(intent: IPlayerIntent<IHighCardFlushWager>) {
         super();
         
-        this.dealer = this.createEmptyDealer();
+        this.dealer = GameFactories.createEmptyDealer();
 
         for (let i = 0; i < this.config.numSeats; i++) {
-            this.seats[i] = this.createEmptySeat();
+            this.seats[i] = GameFactories.createEmptySeat();
 
             if (i == intent.seatIndex) {
                 this.seats[i].taken = true;
@@ -45,47 +46,18 @@ export class HighCardFlush extends CasinoGame<IHighCardFlushWager, IHighCardFlus
 
     protected resolve():void {
         // evaluate the dealer first.
-        this.dealer.hand = GameResolver.evaluateHand(this.dealer.hand);
-        this.dealer.qualify = GameResolver.dealerQualifies(this.dealer.hand);
+        this.dealer.hand = GameResolvers.evaluateHand(this.dealer.hand);
+        this.dealer.qualify = GameResolvers.dealerQualifies(this.dealer.hand);
 
         // now each "taken" seat.
         for (let i = 0; i < this.seats.length; i++) {
             if (this.seats[i].taken) {
-                this.seats[i].hand = GameResolver.evaluateHand(this.seats[i].hand);
+                this.seats[i].hand = GameResolvers.evaluateHand(this.seats[i].hand);
 
-                GameResolver.play(this.seats[i], this.dealer);
-                GameResolver.flush(this.seats[i]);
-                GameResolver.sf(this.seats[i]);
+                GameResolvers.play(this.seats[i], this.dealer);
+                GameResolvers.flush(this.seats[i]);
+                GameResolvers.sf(this.seats[i]);
             }
         }
     }
-
-    // ------------------------------------------------------------------------------------------------
-    // FACTORIES
-
-    protected createEmptyHand = (): IHand => ({
-        cards: [], name: '', eqv: 9999
-    });
-
-    protected createEmptyWager = (): IHighCardFlushWager => ({
-        ante: 0, play: 0, flush: 0, sf: 0
-    });
-
-    protected createEmptyPayout = (): IHighCardFlushPayout => ({
-        ante: 0, play: 0, flush: 0, sf: 0
-    });
-
-    protected createEmptySeat = (): ISeat<IHighCardFlushWager, IHighCardFlushPayout> => ({
-        taken: false,
-        player: false,
-        hand: this.createEmptyHand(),
-        wager: this.createEmptyWager(),
-        payout: this.createEmptyPayout(),
-        result: ''
-    });
-
-    protected createEmptyDealer = (): IDealer => ({
-        hand: this.createEmptyHand(),
-        qualify: false
-    });
 }

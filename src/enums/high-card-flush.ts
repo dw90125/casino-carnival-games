@@ -5,6 +5,7 @@
 * 
 * https://wizardofodds.com/games/high-card-flush/
 */
+import { IHighCardFlushEnums } from "../types/enums/ihighcardflush.js";
 
 /*
 * this is a table lookup for all "flush" hands (e.g. both flushes and straight-flushes)
@@ -12,7 +13,7 @@
 * just uses the "tokenized" version of a hand to determine its strength.
 */
 
-export const FLUSHES:string[] = ["AKQJT98", "AKQJT97", "AKQJT96", "AKQJT95", 
+const FLUSHES:string[] = ["AKQJT98", "AKQJT97", "AKQJT96", "AKQJT95", 
 "AKQJT94", "AKQJT93", "AKQJT92", "AKQJT87", "AKQJT86", "AKQJT85", "AKQJT84", 
 "AKQJT83", "AKQJT82", "AKQJT76", "AKQJT75", "AKQJT74", "AKQJT73", "AKQJT72", 
 "AKQJT65", "AKQJT64", "AKQJT63", "AKQJT62", "AKQJT54", "AKQJT53", "AKQJT52", 
@@ -722,3 +723,6 @@ export const FLUSHES:string[] = ["AKQJT98", "AKQJT97", "AKQJT96", "AKQJT95",
 "74", "73", "72", "65", "64", "63", "62", "54", "53", "52", "43", "42", "32"
 ]; 
 
+export const Enums: IHighCardFlushEnums = {
+  FLUSHES
+};

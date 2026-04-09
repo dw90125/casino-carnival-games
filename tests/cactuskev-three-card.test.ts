@@ -1,6 +1,6 @@
 import { describe, it, expect, beforeEach } from 'vitest';
-import { CactusKevEvaluator } from "../src/evaluators/engines/cactuskev.js";
-import { CactusKevConfig } from "../src/evaluators/config/cactuskev/three-card-poker.js";
+import { CactusKevEvaluator } from "../src/evaluators/cactuskev/engine.js";
+import { Config as CactusKevConfig } from "../src/evaluators/cactuskev/three-card-poker.js";
 
 describe('CactusKevEngine Internals', () => {
     const engine = new CactusKevEvaluator(CactusKevConfig) as any;

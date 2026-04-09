@@ -1,9 +1,9 @@
-import { IGameConfig, IBaseWager, IBasePayout, IHand, ISeat, IDealer, IGameOutcome } from "../types/games/base.js";
+import { IGameConfig, IBaseWager, IBasePayout, IBaseHand, ISeat, IDealer, IGameOutcome } from "../types/games/base.js";
 
-export abstract class CasinoGame<T extends IBaseWager, P extends IBasePayout> {
+export abstract class CasinoGame<H extends IBaseHand, T extends IBaseWager, P extends IBasePayout> {
     protected abstract config: IGameConfig;
-    protected abstract dealer: IDealer;
-    protected abstract seats: ISeat<T, P>[];
+    protected abstract dealer: IDealer<H>;
+    protected abstract seats: ISeat<H, T, P>[];
 
     protected shoe: string[] = [];
 
@@ -26,7 +26,19 @@ export abstract class CasinoGame<T extends IBaseWager, P extends IBasePayout> {
     }
 
     public outcome(): IGameOutcome {
-        const player = this.seats.find(seat => seat.player) as ISeat<T, P>;
+        const player = this.seats.find(seat => seat.player) as ISeat<H, T, P>;
+
+        let base = 0;
+        let bonus = 0;
+
+        for (const [key, val] of Object.entries(player.payout)) {
+            const amount = val as number;
+            if (key == 'ante' || key == 'play') {
+                base += amount;
+            } else {
+                bonus += amount;
+            }
+        }
 
         return {
             dealer: {
@@ -38,20 +50,16 @@ export abstract class CasinoGame<T extends IBaseWager, P extends IBasePayout> {
                 cards: player.hand.cards,
                 name: player.hand.name,
                 result: player.result,
-                payout: Object.values(player.payout).reduce((sum, val) => sum + val, 0)
+                payout: {
+                    base: base,
+                    bonus: bonus,
+                    total: base + bonus
+                }
             }
         };
     }
 
-    // --- Internal Helpers (Common to all games) ---
-    protected abstract createEmptyHand(): IHand;
-    protected abstract createEmptyDealer(): IDealer;
-    protected abstract createEmptySeat(): ISeat<T, P>;
-    protected abstract createEmptyWager(): IBaseWager;
-    protected abstract createEmptyPayout(): IBasePayout;
-
     // --- The Life-Cycle "Contract" ---
-
     /** Handle the shuffle and distribution of cards */
     protected abstract deal(): void;
 
