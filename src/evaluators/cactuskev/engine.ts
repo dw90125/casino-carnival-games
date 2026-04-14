@@ -29,16 +29,9 @@
 * lookups are used for straights and flushes, which are much simpler to evaluate.
 */
 
-import { ICactusKevEnums } from "../../types/enums/icactuskev.js";
+import { ICactusKevEnums } from "../../types/enums/icactuskevenums.js";
 
 export class CactusKevEvaluator {
-  private readonly CARD_VALUES: Record<string, number> = {
-    "AS": 0x10001C29, "KS": 0x08001B25, "QS": 0x04001A1F, "JS": 0x0200191D, "TS": 0x01001817, "9S": 0x00801713, "8S": 0x00401611, "7S": 0x0020150D, "6S": 0x0010140B, "5S": 0x00081307, "4S": 0x00041205, "3S": 0x00021103, "2S": 0x00011002,
-    "AH": 0x10002C29, "KH": 0x08002B25, "QH": 0x04002A1F, "JH": 0x0200291D, "TH": 0x01002817, "9H": 0x00802713, "8H": 0x00402611, "7H": 0x0020250D, "6H": 0x0010240B, "5H": 0x00082307, "4H": 0x00042205, "3H": 0x00022103, "2H": 0x00012002,
-    "AD": 0x10004C29, "KD": 0x08004B25, "QD": 0x04004A1F, "JD": 0x0200491D, "TD": 0x01004817, "9D": 0x00804713, "8D": 0x00404611, "7D": 0x0020450D, "6D": 0x0010440B, "5D": 0x00084307, "4D": 0x00044205, "3D": 0x00024103, "2D": 0x00014002,
-    "AC": 0x10008C29, "KC": 0x08008B25, "QC": 0x04008A1F, "JC": 0x0200891D, "TC": 0x01008817, "9C": 0x00808713, "8C": 0x00408611, "7C": 0x0020850D, "6C": 0x0010840B, "5C": 0x00088307, "4C": 0x00048205, "3C": 0x00028103, "2C": 0x00018002
-  };
-
   private enums: ICactusKevEnums;
 
   constructor(enums: ICactusKevEnums) {
@@ -70,7 +63,7 @@ export class CactusKevEvaluator {
     let val: number = 0xf000;
 
     for (const card of cards) {
-      const cardBitmask = this.CARD_VALUES[card];
+      const cardBitmask = this.enums.CARD_VALUES[card];
 
       if (cardBitmask === undefined) return false;
 
@@ -84,7 +77,7 @@ export class CactusKevEvaluator {
     let val: number = 0;
 
     for (const card of cards) {
-      const cardBitmask = this.CARD_VALUES[card];
+      const cardBitmask = this.enums.CARD_VALUES[card];
 
       if (cardBitmask === undefined) return false;
 
@@ -98,7 +91,7 @@ export class CactusKevEvaluator {
     let product: number = 0x01;
 
     for (const card of cards) {
-      const cardBitmask = this.CARD_VALUES[card];
+      const cardBitmask = this.enums.CARD_VALUES[card];
 
       if (cardBitmask === undefined) return false;
 

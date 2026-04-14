@@ -4,13 +4,12 @@ export interface IGameConfig {
     masterDeck: string[];
 }
 
-export interface IBaseWager {}
+export interface IBaseWager { }
 
-export interface IBasePayout {}
+export interface IBasePayout { }
 
 export interface IBaseHand {
     cards: string[];
-    name: string;
 }
 
 export interface IDealer<H extends IBaseHand> {
@@ -24,7 +23,7 @@ export interface ISeat<H extends IBaseHand, T extends IBaseWager, P extends IBas
     hand: H;
     wager: T;
     payout: P;
-    result:string;
+    result: string;
 }
 
 export interface IPlayerIntent<T extends IBaseWager> {
@@ -42,6 +41,6 @@ export interface IGameOutcome {
         cards: string[];
         name: string;
         result: string;
-        payout: {base: number, bonus: number, total: number};
+        payout: { base: number, bonus: number, total: number };
     }
 }

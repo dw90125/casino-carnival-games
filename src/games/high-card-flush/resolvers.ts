@@ -2,10 +2,11 @@ import { ISeat, IDealer } from "../../types/games/base.js";
 import { IHighCardFlushHand, IHighCardFlushWager, IHighCardFlushPayout } from "../../types/games/high-card-flush.js";
 
 import { BasicEvaluator } from "../../evaluators/basic/engine.js";
-import { Enums as HCFEnums } from  "../../enums/high-card-flush.js";
+import { Enums as HCFEnums } from "../../enums/high-card-flush.js";
 
 const evaluateHand = (hand: IHighCardFlushHand): IHighCardFlushHand => {
-    const basicev = new BasicEvaluator(hand.cards);
+    const basicev = new BasicEvaluator(HCFEnums);
+    basicev.set_cards(hand.cards);
 
     let best_eqv: number = 9999;
     let best_len: number = 0; // really you'll never have worse than a two-card flush, though.
@@ -87,8 +88,9 @@ const flush = (seat: ISeat<IHighCardFlushHand, IHighCardFlushWager, IHighCardFlu
 }
 
 const sf = (seat: ISeat<IHighCardFlushHand, IHighCardFlushWager, IHighCardFlushPayout>): void => {
-    const basicev = new BasicEvaluator(seat.hand.cards);
-    
+    const basicev = new BasicEvaluator(HCFEnums);
+    basicev.set_cards(seat.hand.cards);
+
     // the "straight-flush bonus" doesn't really care about the larger game.
     // if your hand has a straight-flush of 3 or more, then you get the bonus,
     // even if you FOLD the hand.
@@ -107,7 +109,7 @@ const sf = (seat: ISeat<IHighCardFlushHand, IHighCardFlushWager, IHighCardFlushP
     const suit_bits: Record<string, string> = basicev.suit_bits();
 
     const bitStrings = Object.values(suit_bits);
-    const winningTier = PAYOUTS.find(({ len }) => 
+    const winningTier = PAYOUTS.find(({ len }) =>
         // since an Ace can be part of both Ace-high and Ace-low straights, copy its bit to the end for efficiency
         bitStrings.some(bits => (bits + bits.charAt(0)).includes('1'.repeat(len)))
     );

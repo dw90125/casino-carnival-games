@@ -4,22 +4,36 @@
 * Performs minimal checks on a poker hand by sorting the hand by ranks, suits,
 * or both to establish matches with basic rules of poker.
 * 
+* I've removed the joker support for the time being.  Pai-Gow's joker rule just doesn't
+* fit well here.  And a joker being ANY card would blow this logic apart.
+* So, keeping it simple.  If we see a joker ("*") in a hand we exclude it from all counts.
 */
 
+import { IBasicEnums } from "../../types/enums/ibasicenums.js";
+
 export class BasicEvaluator {
-    private readonly RANKS: string[] = ['A', 'K', 'Q', 'J', 'T', '9', '8', '7', '6', '5', '4', '3', '2'];
-    private readonly SUITS: string[] = ['S', 'H', 'D', 'C'];
+    private enums: IBasicEnums;
 
     private cards: string[] = [];
 
-    constructor(cards: string[]) {
+    private ranks: Record<string, number> = {};
+    private suits: Record<string, number> = {};
+    private matrix: Record<string, Record<string, number>> = {};
+
+    constructor(enums: IBasicEnums) {
+        this.enums = enums;
+    }
+
+    public set_cards(cards: string[]) {
         this.cards = cards;
+
+        this.sort_ranks();
+        this.sort_suits();
+        this.sort_matrix();
     }
 
     public identify(): string {
-        if (this.has_five_aces()) {
-            return "Five Aces";
-        } else if (this.has_royal_flush()) {
+        if (this.has_royal_flush()) {
             return "Royal Flush";
         } else if (this.has_straight_flush()) {
             return "Straight Flush";
@@ -43,23 +57,19 @@ export class BasicEvaluator {
     }
 
     public num_pairs(): number {
-        const ranks = this.sort_ranks(true);
-        return Object.values(ranks).filter(n => n === 2).length;
+        return Object.values(this.ranks).filter(n => n === 2).length;
     }
 
     public num_trips(): number {
-        const ranks = this.sort_ranks(true);
-        return Object.values(ranks).filter(n => n === 3).length;
+        return Object.values(this.ranks).filter(n => n === 3).length;
     }
 
     public has_trips(): boolean {
-        const ranks = this.sort_ranks(true);
-        return Object.values(ranks).includes(3);
+        return Object.values(this.ranks).includes(3);
     }
 
     public has_quads(): boolean {
-        const ranks = this.sort_ranks(true);
-        return Object.values(ranks).includes(4);
+        return Object.values(this.ranks).includes(4);
     }
 
     public has_full_house(): boolean {
@@ -101,10 +111,8 @@ export class BasicEvaluator {
     public has_flush(): boolean {
         const hand_size = Math.min(this.cards.length, 5);
 
-        const suits = this.sort_suits();
-
-        for (const suit of this.SUITS) {
-            const chk = suits[suit];
+        for (const suit of this.enums.SUITMAP) {
+            const chk = this.suits[suit];
 
             if (chk >= hand_size) {
                 return true;
@@ -159,43 +167,32 @@ export class BasicEvaluator {
         return false;
     }
 
-    //----------------------------------------------------------------------------------------------------------------------
-    // five aces is a fun part of wild-card poker
-    public has_five_aces(): boolean {
-        const ranks = this.sort_ranks(true);
-        return (ranks['A'] === 5);
-    }
-
     //---------------------------------------------------------------------------------------------------------------------
     //---------------------------------------------------------------------------------------------------------------------
     //---------------------------------------------------------------------------------------------------------------------
     // "tokens" can be useful sometimes for some games:
     public suit_tokens(): Record<string, string> {
-        const matrix = this.sort_matrix();
-
         const tokens: Record<string, string> = {};
 
-        this.SUITS.forEach(s => tokens[s] = "");
+        this.enums.SUITMAP.forEach(s => tokens[s] = "");
 
-        for (const s of this.SUITS) {
-            tokens[s] = this.RANKS.map(r => matrix[s][r] > 0 ? r : '').join('');
+        for (const s of this.enums.SUITMAP) {
+            tokens[s] = this.enums.RANKMAP.map(r => this.matrix[s][r] > 0 ? r : '').join('');
         }
 
         return tokens;
     }
 
     public suit_bits(wrap: boolean = false): Record<string, string> {
-        const matrix = this.sort_matrix();
-
         const bits: Record<string, string> = {};
 
-        this.SUITS.forEach(s => bits[s] = "");
+        this.enums.SUITMAP.forEach(s => bits[s] = "");
 
-        for (const s of this.SUITS) {
-            bits[s] = this.RANKS.map(r => matrix[s][r] > 0 ? '1' : '0').join('').padStart(13, "0");
+        for (const s of this.enums.SUITMAP) {
+            bits[s] = this.enums.RANKMAP.map(r => this.matrix[s][r] > 0 ? '1' : '0').join('').padStart(13, "0");
 
             if (wrap) {
-                bits[s] = bits[s].concat(bits[s].charAt(0)); // for the ace-low straight.
+                bits[s] += bits[s].charAt(0); // for the ace-low straight.
             }
         }
 
@@ -206,11 +203,9 @@ export class BasicEvaluator {
 
     public rank_tokens(): string {
         let tokens: string = "";
-        
-        const ranks = this.sort_ranks();
 
-        for (const r of this.RANKS) {
-            tokens += (ranks[r] > 0 ? r.repeat(ranks[r]) : '');
+        for (const r of this.enums.RANKMAP) {
+            tokens += (this.ranks[r] > 0 ? r.repeat(this.ranks[r]) : '');
         }
 
         return tokens;
@@ -218,17 +213,15 @@ export class BasicEvaluator {
 
     public rank_bits(wrap: boolean = false): string {
         let bits: string = "";
-        
-        const ranks = this.sort_ranks();
 
-        for (const r of this.RANKS) {
-            bits += (ranks[r] > 0 ? '1' : '0');
+        for (const r of this.enums.RANKMAP) {
+            bits += (this.ranks[r] > 0 ? '1' : '0');
         }
 
         bits = bits.padStart(13, "0");
 
         if (wrap) {
-            bits = bits.concat(bits.charAt(0)); // for the ace-low straight.
+            bits += bits.charAt(0); // for the ace-low straight.
         }
 
         return bits;
@@ -237,45 +230,38 @@ export class BasicEvaluator {
     //---------------------------------------------------------------------------------------------------------------------
     // These methods solely count how many of each type we have.
 
-    private sort_ranks(count_wildcard_as_ace: boolean = false): Record<string, number> {
-        const ranks: Record<string, number> = {};
+    private sort_ranks(): void {
+        this.ranks = {};
 
-        this.RANKS.forEach(r => ranks[r] = 0);
+        this.enums.RANKMAP.forEach(r => this.ranks[r] = 0);
 
         for (const card of this.cards) {
-            if (card == "*") {
-                if (count_wildcard_as_ace) ranks['A'] ++;
-			    continue;
-		    }
-            
-            const r = card[0];
-            if (r in ranks) ranks[r]++;
-        }
+            if (card == "*") continue;
 
-        return ranks;
+            const r = card[0];
+            if (r in this.ranks) this.ranks[r]++;
+        }
     }
 
-    private sort_suits(): Record<string, number> {
-        const suits: Record<string, number> = {};
+    private sort_suits(): void {
+        this.suits = {};
 
-        this.SUITS.forEach(s => suits[s] = 0);
+        this.enums.SUITMAP.forEach(s => this.suits[s] = 0);
 
         for (const card of this.cards) {
             if (card == "*") continue;
 
             const s = card[1];
-            if (s in suits) suits[s]++;
+            if (s in this.suits) this.suits[s]++;
         }
-
-        return suits;
     }
 
-    private sort_matrix(): Record<string, Record<string, number>> {
-        const matrix: Record<string, Record<string, number>> = {};
+    private sort_matrix(): void {
+        this.matrix = {};
 
-        this.SUITS.forEach(s => {
-            matrix[s] = {};
-            this.RANKS.forEach(r => matrix[s][r] = 0);
+        this.enums.SUITMAP.forEach(s => {
+            this.matrix[s] = {};
+            this.enums.RANKMAP.forEach(r => this.matrix[s][r] = 0);
         });
 
         for (const card of this.cards) {
@@ -284,11 +270,9 @@ export class BasicEvaluator {
             let r = card[0];
             let s = card[1];
 
-            if ((s in matrix) && (r in matrix[s])) {
-                matrix[s][r]++;
+            if ((s in this.matrix) && (r in this.matrix[s])) {
+                this.matrix[s][r]++;
             }
         }
-
-        return matrix;
     }
 }

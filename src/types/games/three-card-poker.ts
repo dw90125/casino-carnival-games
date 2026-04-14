@@ -2,6 +2,7 @@ import { IBaseWager, IBasePayout, IBaseHand } from "./base.js";
 
 export interface IThreeCardPokerHand extends IBaseHand {
     eqv: number;
+    name: string;
 }
 
 export interface IThreeCardPokerWager extends IBaseWager {

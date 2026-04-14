@@ -52,8 +52,10 @@ export const displayOutcome = <T extends IBaseWager, P extends IBasePayout>(outc
     //output += `Dealer Hand: ${dealerHand} (${dealer.name}) [${dealer.qualify ? 'qualifies' : 'no-qualify'}]\n`;
     output += `Dealer Hand: ${dealerHand} (${dealer.name})\n`;
 
+    const player_bonus = (player.payout.bonus > 0) ? '[BONUS!]' : '';
+
     // Player
-    output += `Your Hand:   ${playerHand} (${player.name}) [${player.result}]\n`;
+    output += `Your Hand:   ${playerHand} (${player.name}) [${player.result}] ${player_bonus}\n`;
     output += `Payout:      $${player.payout.total}  (Main Game: $${player.payout.base} / Bonuses: $${player.payout.bonus})\n`;
 
     console.log(output);

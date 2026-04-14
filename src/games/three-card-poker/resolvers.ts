@@ -2,17 +2,17 @@ import { ISeat, IDealer } from "../../types/games/base.js";
 import { IThreeCardPokerHand, IThreeCardPokerWager, IThreeCardPokerPayout } from "../../types/games/three-card-poker.js";
 
 import { CactusKevEvaluator } from "../../evaluators/cactuskev/engine.js";
-import { Enums as CactusKevEnums3 } from "../../enums/three-card-poker.js";
-import { Enums as CactusKevEnums5 } from "../../enums/five-card-poker.js";
+import { ThreeCardPokerEnums } from "../../enums/three-card-poker.js";
+import { CactusKevEnums } from "../../enums/cactuskev.js";
 
 const evaluateHand = (hand: IThreeCardPokerHand): IThreeCardPokerHand => {
-	const cactuskev3 = new CactusKevEvaluator(CactusKevEnums3);
+    const cactuskev3 = new CactusKevEvaluator(ThreeCardPokerEnums);
 
     const eqv = cactuskev3.evaluate(hand.cards);
 
     return {
         ...hand,
-        name: CactusKevEnums3.HAND_NAMES(eqv),
+        name: ThreeCardPokerEnums.HAND_NAMES(eqv),
         eqv: eqv
     };
 };
@@ -82,10 +82,10 @@ const pp = (seat: ISeat<IThreeCardPokerHand, IThreeCardPokerWager, IThreeCardPok
 }
 
 const six = (seat: ISeat<IThreeCardPokerHand, IThreeCardPokerWager, IThreeCardPokerPayout>, dealer: IDealer<IThreeCardPokerHand>): void => {
-    const cactuskev5 = new CactusKevEvaluator(CactusKevEnums5);
+    const cactuskev5 = new CactusKevEvaluator(CactusKevEnums);
 
     seat.payout.six = 0;
-    
+
     const six_card_hand = [...seat.hand.cards, ...dealer.hand.cards];
 
     let best_eqv = 9999;
@@ -96,7 +96,7 @@ const six = (seat: ISeat<IThreeCardPokerHand, IThreeCardPokerWager, IThreeCardPo
             best_eqv = eqv;
         }
     }
-    
+
     if (best_eqv > 0) {
         if (best_eqv == 1) { // ROYAL 1000:1
             seat.payout.six = (seat.wager.six * 1001);

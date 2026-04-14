@@ -1,9 +1,9 @@
 import { describe, it, expect, beforeEach } from 'vitest';
 import { CactusKevEvaluator } from "../src/evaluators/cactuskev/engine.js";
-import { Config as CactusKevConfig } from "../src/evaluators/cactuskev/five-card-poker.js";
+import { CactusKevEnums } from "../src/enums/cactuskev.js";
 
 describe('CactusKevEngine Internals', () => {
-    const engine = new CactusKevEvaluator(CactusKevConfig) as any;
+    const engine = new CactusKevEvaluator(CactusKevEnums) as any;
 
     it('identifies a 5-card Flush correctly', () => {
         const flushHand = ["KS", "9S", "4S", "TS", "AS"];

@@ -1,4 +1,5 @@
 export interface ICactusKevEnums {
+  readonly CARD_VALUES: Record<string, number>;
   readonly FLUSHES: number[];
   readonly UNIQUES: number[];
   readonly PRODUCTS: number[];

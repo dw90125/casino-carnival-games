@@ -2,7 +2,8 @@ import { IBaseWager, IBasePayout, IBaseHand } from "./base.js";
 
 export interface IHighCardFlushHand extends IBaseHand {
     eqv: number;
-} 
+    name: string;
+}
 
 export interface IHighCardFlushWager extends IBaseWager {
     ante: number;
