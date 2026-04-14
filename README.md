@@ -45,5 +45,5 @@ Some games and/or side-wagers can benefit from direct evaluation versus the Cact
 ## 💻 Environment & Tools
 * **Runtime:** Node.js
 * **Language:** TypeScript (ES6+)
-* **Environment:** WSL2 (Ubuntu) / Docker
+* **Environment:** WSL2 (Ubuntu)
 * **Testing:** Vitest
